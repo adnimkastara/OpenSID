@@ -34,7 +34,7 @@ class AnjunganMenuController extends AnjunganBaseController
 
         return datatables()->of(AnjunganMenu::query()->orderBy('urut'))
             ->addIndexColumn()
-            ->addColumn('drag-handle', static fn (): string => '<i class="fa fa-arrows-v"></i>')
+            ->addColumn('drag-handle', static fn (): string => '<i class="fa fa-sort-alpha-desc"></i>')
             ->addColumn('ceklist', static function ($row) {
                 if (can('h')) {
                     return '<input type="checkbox" name="id_cb[]" value="' . $row->id . '"/>';
@@ -142,14 +142,16 @@ class AnjunganMenuController extends AnjunganBaseController
         redirect_with('success', 'Berhasil Ubah Status');
     }
 
-    public function tukar(): void
+    public function tukar()
     {
         isCan('u');
 
-        $ids = (array) $this->input->post('id');
+        $ids = array_filter((array) $this->input->post('data'));
         foreach ($ids as $index => $id) {
             AnjunganMenu::where('id', $id)->update(['urut' => $index + 1]);
         }
+
+        return response()->json(['status' => true]);
     }
 
     private function payload(?AnjunganMenu $menu = null): array
